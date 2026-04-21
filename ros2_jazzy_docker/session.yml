@@ -1,0 +1,14 @@
+
+name: ros2_session
+root: ~/ros2_ws
+
+# Sourced before every pane command
+pre_window: source <%= @settings["setup_name"] %>
+startup_window: main
+
+windows:
+  - main:
+      layout: tiled
+      panes:
+        - echo "ROS2 Jazzy ready. ROS_DOMAIN_ID=$ROS_DOMAIN_ID"
+

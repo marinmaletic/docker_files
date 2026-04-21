@@ -6,32 +6,45 @@ A collection of Docker environments for robotics development. Each subfolder is 
  
 | Folder | Base | Description |
 |--------|------|-------------|
-| `ros2/ros2-jazzy/general` | Ubuntu 24.04 + CUDA 12.6.1 | General-purpose ROS2 Jazzy dev environment |
+| `ros2-jazzy` | Ubuntu 24.04 + CUDA 12.6.1 | General-purpose ROS2 Jazzy dev environment |
  
 ---
  
-## 1. Install Docker
- 
+## 1. [Install Docker](https://docs.docker.com/engine/install/ubuntu/)
+
 ```bash
-# Add Docker's official GPG key and repo
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl
+# Run the following command to uninstall all conflicting packages: 
+sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
+
+# Add Docker's official GPG key:
+sudo apt update
+sudo apt install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
- 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-  https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
- 
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Add the repository to Apt sources:
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
- 
+
+Verify that the installation is successful by running the hello-world image:
+``` bash
+ sudo docker run hello-world
+ ```
+
 ### Run Docker without sudo (recommended)
 ```bash
+sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker   # apply without logging out
 ```
@@ -57,7 +70,7 @@ sudo systemctl restart docker
 ## 2. Clone this repository
  
 ```bash
-git clone git@github.com:yourusername/docker_files.git
+git clone git@github.com:marinmaletic/docker_files.git
 cd docker_files
 ```
  
@@ -95,7 +108,7 @@ echo 'eval $(ssh-agent -s) > /dev/null && ssh-add ~/.ssh/id_ed25519 2>/dev/null'
 Navigate to the environment you want and follow the `README.md` inside it. The general workflow is the same for all of them:
  
 ```bash
-cd ros2/ros2-jazzy/general
+cd ros2-jazzy
  
 export DOCKER_BUILDKIT=1
 docker build -t <image_name> .
@@ -124,26 +137,9 @@ docker images
 docker rmi <image_name>
 ```
  
----
- 
-## Repository structure
- 
+ ## Cleanup
+The docker system prune command is a shortcut that prunes images, containers, and networks. Volumes aren't pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
+
+```bash
+docker system prune --volumes
 ```
-docker_files/
-└── ros2/
-    └── ros2-jazzy/
-        └── general/
-            ├── Dockerfile
-            ├── first_run.sh
-            ├── start.sh
-            ├── session.yml
-            ├── _setup.sh
-            ├── README.md
-            └── config/
-                ├── aliases
-                ├── tmux.conf
-                ├── nanorc
-                └── ranger
-```
- 
-New environments follow the same layout and get their own subfolder.

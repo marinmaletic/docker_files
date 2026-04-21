@@ -1,0 +1,87 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# General aliases for ROS2 Jazzy container
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Shell ─────────────────────────────────────────────────────────────────────
+alias re-source='source ~/.bashrc'
+
+# NVIDIA offloading for WSL2 with NVIDIA GPU (requires WSL2 22H2+ and NVIDIA drivers 535+)
+alias nvrun='__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia'
+
+# ── ROS2 shorthands ───────────────────────────────────────────────────────────
+alias sr='source /opt/ros/jazzy/setup.bash'
+alias sw='source $HOME/ros2_ws/install/setup.bash'
+alias srw='source /opt/ros/jazzy/setup.bash && source $HOME/ros2_ws/install/setup.bash'
+
+# colcon build shortcuts (run from ros2_ws root)
+alias cb='colcon build --symlink-install --merge-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+alias cbt='colcon build --symlink-install --merge-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --packages-select'
+alias cbs='colcon build --symlink-install'
+alias ct='colcon test'
+alias ctt='colcon test --packages-select'
+
+# ROS2 topic / service / node shortcuts
+alias rtl='ros2 topic list'
+alias rte='ros2 topic echo'
+alias rni='ros2 node info'
+alias rnl='ros2 node list'
+alias rsl='ros2 service list'
+alias rpl='ros2 param list'
+
+# Quickly inspect tf tree
+alias tf-tree='ros2 run tf2_tools view_frames'
+
+# ROS2 bag
+alias bag-record='ros2 bag record -a'
+alias bag-play='ros2 bag play'
+alias bag-info='ros2 bag info'
+
+# ── Git shorthands ────────────────────────────────────────────────────────────
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push'
+alias gl='git pull'
+alias glog='git log --oneline --graph --decorate'
+
+# ── Process management ────────────────────────────────────────────────────────
+
+# Kill a process and all its children recursively
+killp() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: killp <pid>"
+        return 1
+    fi
+    local pes=$1
+    for child in $(ps -o pid,ppid -ax | awk "{ if ( \$2 == $pes ) { print \$1 }}"); do
+        killp "$child"
+    done
+    kill -9 "$1" > /dev/null 2>&1 || true
+}
+
+# Kill all running ROS2 nodes and related processes
+kill_ros2() {
+    echo "[*] Killing all ROS2 processes..."
+    ps aux | grep -E 'ros2|rclpy|rclcpp' | grep -v grep | awk '{ print "kill -9", $2 }' | sh
+    echo "[*] Done."
+}
+
+# Wait until at least one ROS2 node is alive
+waitForRos2() {
+    echo -n "[*] Waiting for ROS2..."
+    until ros2 node list > /dev/null 2>&1; do
+        echo -n "."
+        sleep 1
+    done
+    echo " ready."
+}
+
+# ── SSH agent check ───────────────────────────────────────────────────────────
+# Print a warning if SSH agent is not forwarded (no git push will work)
+check_ssh_agent() {
+    if ssh-add -l > /dev/null 2>&1; then
+        echo "[✓] SSH agent forwarded. $(ssh-add -l | wc -l) key(s) loaded."
+    else
+        echo "[✗] SSH agent not available. Run 'eval \$(ssh-agent -s) && ssh-add' on the HOST."
+    fi
+}

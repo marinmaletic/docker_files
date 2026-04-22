@@ -6,29 +6,15 @@ Includes CUDA/GPU support, X11 forwarding, SSH agent forwarding for git, tmux, a
 ---
 
 ## Prerequisites
-
-- Ubuntu 24.04 host (other versions should work)
 - [Docker Engine](https://docs.docker.com/engine/install/ubuntu/) installed
 - NVIDIA GPU (optional) — follow the [GPU support guide](https://github.com/larics/docker_files/wiki/2.-Installation#gpu-support) and install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
-### Non-root Docker (recommended)
-```bash
-sudo usermod -aG docker $USER
-# Log out and back in, or run: newgrp docker
-```
-
-### X11 for GUI apps
-```bash
-xhost +local:docker
-# Make it permanent:
-echo "xhost +local:docker > /dev/null" >> ~/.profile
-```
 
 ## Build & Run
 
 ```bash
 # 1. Clone / copy this folder
-cd ros2_jazzy_docker
+cd ros2_jazzy
 
 # 2. Export BuildKit (required for SSH during build)
 export DOCKER_BUILDKIT=1
@@ -133,14 +119,4 @@ gs / ga / gc / gp / gl / glog
 
 # SSH
 check_ssh_agent   # verify key forwarding
-```
-
----
-
-## Customising for a Project
-
-```bash
-docker build -t ros2_jazzy_img .
-docker rm ros2_jazzy_cont
-./first_run.sh
 ```

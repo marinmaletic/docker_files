@@ -114,7 +114,9 @@ export DOCKER_BUILDKIT=1
 docker build -t <image_name> .
 ./first_run.sh
 ```
- 
+
+--- 
+
 ### Common Docker commands
 ```bash
 # Re-enter a container after it has been stopped
@@ -135,11 +137,8 @@ docker images
  
 # Delete an image
 docker rmi <image_name>
-```
- 
- ## Cleanup
-The docker system prune command is a shortcut that prunes images, containers, and networks. Volumes aren't pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
 
-```bash
+# The docker system prune command is a shortcut that prunes images, containers, and networks. Volumes aren't pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
 docker system prune --volumes
 ```
+ 

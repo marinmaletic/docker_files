@@ -1,0 +1,14 @@
+# <project>/.container-env — optional, sourced by run.sh.
+
+# Which environment image to use (folder name under docker_files/envs/).
+# Default is the ROS one; set this for non-ROS projects:
+# ENV_NAME=ubuntu24.04-cuda12.6
+
+# Pin the image tag so this project stays reproducible when the base image
+# is rebuilt with newer apt package versions.
+IMAGE_TAG=u2404-cu126-2026-09
+# Extra docker run flags for this project only, e.g. real hardware:
+# EXTRA_ARGS=(--device=/dev/ttyUSB0 --device=/dev/input/js0)
+
+# Force a specific DDS domain (default is derived from the folder name):
+# ROS_DOMAIN_ID=42

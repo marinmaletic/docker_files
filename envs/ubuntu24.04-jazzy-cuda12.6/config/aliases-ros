@@ -1,0 +1,51 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# ROS2 Jazzy aliases — sourced from .bashrc in the ROS environment only
+# Workspace is bind-mounted at ~/ws
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Sourcing ──────────────────────────────────────────────────────────────────
+alias sr='source /opt/ros/jazzy/setup.bash'
+alias sw='source $HOME/ws/install/setup.bash'
+alias srw='source /opt/ros/jazzy/setup.bash && source $HOME/ws/install/setup.bash'
+
+# ── colcon build (run from ~/ws) ──────────────────────────────────────────────
+alias cb='colcon build --symlink-install --merge-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+alias cbt='colcon build --symlink-install --merge-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --packages-select'
+alias cbs='colcon build --symlink-install'
+alias ct='colcon test'
+alias ctt='colcon test --packages-select'
+
+# ── Topics / nodes / services ─────────────────────────────────────────────────
+alias rtl='ros2 topic list'
+alias rte='ros2 topic echo'
+alias rni='ros2 node info'
+alias rnl='ros2 node list'
+alias rsl='ros2 service list'
+alias rpl='ros2 param list'
+
+# ── TF ────────────────────────────────────────────────────────────────────────
+alias tf-tree='ros2 run tf2_tools view_frames'
+
+# ── Bags ──────────────────────────────────────────────────────────────────────
+alias bag-record='ros2 bag record -a'
+alias bag-play='ros2 bag play'
+alias bag-info='ros2 bag info'
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+# Kill all running ROS2 nodes and related processes
+kill_ros2() {
+    echo "[*] Killing all ROS2 processes..."
+    ps aux | grep -E 'ros2|rclpy|rclcpp' | grep -v grep | awk '{ print "kill -9", $2 }' | sh
+    echo "[*] Done."
+}
+
+# Wait until at least one ROS2 node is alive
+waitForRos2() {
+    echo -n "[*] Waiting for ROS2..."
+    until ros2 node list > /dev/null 2>&1; do
+        echo -n "."
+        sleep 1
+    done
+    echo " ready."
+}

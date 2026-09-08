@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# General aliases — shared by all environments
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Shell ─────────────────────────────────────────────────────────────────────
+alias re-source='source ~/.bashrc'
+alias ll='ls -alh'
+
+# ── Git shorthands ────────────────────────────────────────────────────────────
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push'
+alias gl='git pull'
+alias glog='git log --oneline --graph --decorate'
+
+# ── Process management ────────────────────────────────────────────────────────
+
+# Kill a process and all its children recursively
+killp() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: killp <pid>"
+        return 1
+    fi
+    local pes=$1
+    for child in $(ps -o pid,ppid -ax | awk "{ if ( \$2 == $pes ) { print \$1 }}"); do
+        killp "$child"
+    done
+    kill -9 "$1" > /dev/null 2>&1 || true
+}
+
+# ── SSH agent check ───────────────────────────────────────────────────────────
+# The agent socket is forwarded from the host by run.sh
+check_ssh_agent() {
+    if ssh-add -l > /dev/null 2>&1; then
+        echo "[✓] SSH agent forwarded. $(ssh-add -l | wc -l) key(s) loaded."
+    else
+        echo "[✗] SSH agent not available. Run 'eval \$(ssh-agent -s) && ssh-add' on the HOST,"
+        echo "    then recreate this container (docker rm ... && run.sh ...)."
+    fi
+}

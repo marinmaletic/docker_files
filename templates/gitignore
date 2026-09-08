@@ -1,0 +1,17 @@
+# colcon artifacts — these are generated INSIDE the container against
+# container libraries. Never commit them; they are not portable and they
+# are what turned the old container into a 99 GB layer.
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+
+# ROS / MoveIt generated
+*.rviz.bak
+
+# Editor
+.vscode/
+.idea/

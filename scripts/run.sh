@@ -78,11 +78,16 @@ chmod a+r "${XAUTH}"
 # ssh-agent socket     -> git push works; keys stay on the host
 GIT_ARGS=()
 [ -f "${HOME}/.gitconfig" ] && GIT_ARGS+=(-v "${HOME}/.gitconfig:/home/${USER}/.gitconfig:ro")
-if [ -n "${SSH_AUTH_SOCK:-}" ]; then
-  GIT_ARGS+=(-v "${SSH_AUTH_SOCK}:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent)
+
+# Mount the STABLE symlink location, not $SSH_AUTH_SOCK. The symlink is
+# maintained by ~/.profile and always points at the current agent socket,
+# so container mounts survive host reboots and agent restarts.
+SSH_LINK="${HOME}/.ssh/ssh_auth_sock"
+if [ -L "${SSH_LINK}" ] || [ -S "${SSH_LINK}" ]; then
+  GIT_ARGS+=(-v "${SSH_LINK}:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent)
 else
-  echo "[!] SSH_AUTH_SOCK unset — git push over SSH won't work in the container."
-  echo "    On the HOST:  eval \$(ssh-agent -s) && ssh-add ~/.ssh/id_ed25519"
+  echo "[!] ${SSH_LINK} missing — git push over SSH won't work in the container."
+  echo "    Check that ~/.profile has the ssh-agent block, then log out/in."
 fi
 
 if [ -n "$(docker ps -aq -f "name=^/${CONTAINER}$")" ]; then

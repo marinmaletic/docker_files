@@ -23,10 +23,10 @@ if [ -z "$(docker ps -aq -f "name=^/${CONTAINER}$")" ]; then
   exit 1
 fi
 
-XAUTH=/tmp/.docker.xauth
+XAUTH="${HOME}/.docker.xauth"
 touch "${XAUTH}"
 xauth nlist "${DISPLAY}" | sed -e 's/^..../ffff/' | xauth -f "${XAUTH}" nmerge - 2>/dev/null || true
-chmod a+r "${XAUTH}"
+chmod 600 "${XAUTH}"
 
 [ -z "$(docker ps -q -f "name=^/${CONTAINER}$")" ] && docker start "${CONTAINER}" >/dev/null
 

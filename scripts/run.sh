@@ -68,10 +68,10 @@ if [ "${HAS_ROS}" = "1" ]; then
 fi
 
 # --- xauth: rebuilt every run; /tmp is wiped at reboot --------------------
-XAUTH=/tmp/.docker.xauth
+XAUTH="${HOME}/.docker.xauth"
 touch "${XAUTH}"
 xauth nlist "${DISPLAY}" | sed -e 's/^..../ffff/' | xauth -f "${XAUTH}" nmerge - 2>/dev/null || true
-chmod a+r "${XAUTH}"
+chmod 600 "${XAUTH}"
 
 # --- git inside the container ---------------------------------------------
 # .gitconfig read-only -> identity already set, no per-container setup
